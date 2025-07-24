@@ -7,6 +7,7 @@ module.exports = async (req, res) => {
   const formData = req.body;
   const token = formData.token;
 
+  // Uncomment this block when token validation is ready
   // const isLocal = process.env.RUN_MODE === 'd'; // or use NODE_ENV if preferred
   // if (!isLocal && !tokenStore.isValid(token)) {
   //   return res.status(403).json({ success: false, error: 'Invalid or expired token' });
@@ -22,11 +23,29 @@ module.exports = async (req, res) => {
       submittedAt: new Date()
     });
 
-    // Trigger custom logic (event upsert + email)
+    // Build structured payload for main server
+    const eventDetails = {
+      startTime: new Date(formData.eventDate),
+      endTime: new Date(new Date(formData.eventDate).getTime() + 2 * 60 * 60 * 1000), // 2-hour event
+      summary: formData.eventName,
+      description: `Event at ${formData.eventLocation}`,
+      location: formData.eventLocation,
+      organizer: {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email
+      }
+    };
+
+    const selectedUser = {
+      name: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email
+    };
+
+    // Trigger custom logic on main server
     await fetch('https://admin-backend-eta.vercel.app/api/forms/submit-form', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
+      body: JSON.stringify({ eventDetails, selectedUser })
     });
 
     return res.status(200).json({
