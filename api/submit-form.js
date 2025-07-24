@@ -7,10 +7,10 @@ module.exports = async (req, res) => {
   const formData = req.body;
   const token = formData.token;
 
-  const isLocal = process.env.RUN_MODE === 'd'; // or use NODE_ENV if preferred
-  if (!isLocal && !tokenStore.isValid(token)) {
-    return res.status(403).json({ success: false, error: 'Invalid or expired token' });
-  }
+  // const isLocal = process.env.RUN_MODE === 'd'; // or use NODE_ENV if preferred
+  // if (!isLocal && !tokenStore.isValid(token)) {
+  //   return res.status(403).json({ success: false, error: 'Invalid or expired token' });
+  // }
 
   try {
     const db = await getDb();
