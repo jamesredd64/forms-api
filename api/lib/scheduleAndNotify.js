@@ -100,19 +100,20 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       to: selectedUser
     });
 
+    const scheduledTime = new Date(eventDetails.scheduledTime).toLocaleString();
+
     const mailOptions = {
-      from: eventDetails.organizer?.email || process.env.EMAIL_USER,
-      to: selectedUser.email,
-      subject: eventDetails.summary || 'Event Invite',
-      text: 'Please find the calendar event attached.',
-      html: '<p>Please find the calendar event attached. Click to add to your calendar.</p>',
-      icalEvent: {
+    from: eventDetails.organizer?.email || process.env.EMAIL_USER,
+    to: selectedUser.email,
+    subject: eventDetails.summary || 'Event Invitation you asked for',
+    text: `You are invited to ${eventDetails.summary} scheduled on ${scheduledTime}. Please find the calendar event attached.`,
+    html: `<p>You are invited to ${eventDetails.summary} scheduled on ${scheduledTime}. Please find the calendar event attached. <a href="#">Click to add to your calendar</a>.</p>`,
+    icalEvent: {
         filename: 'invitation.ics',
         method: 'REQUEST',
         content: icsContent
-      }
+    }
     };
-
     const recentInvite = await db.collection('invitesSent').findOne({
         to: selectedUser.email,
         summary: eventDetails.summary,
