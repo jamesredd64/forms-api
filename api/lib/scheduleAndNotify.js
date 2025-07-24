@@ -121,13 +121,34 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       });
       
       if (recentInvite) {
-        console.warn('⏱️ Invite already sent recently via invitesSent log. Skipping.');
+        console.warn('⏱️ Invite already sent recently via invitesSent log. Skipping email and user update.');
+      
+        // If this is an existing event, return it without modifying selectedUsers
+        if (existingEvent) {
+          return {
+            success: true,
+            eventId: existingEvent._id,
+            message: 'Duplicate invite detected — skipping email and user update.'
+          };
+        }
+      
+        // Otherwise, create the event but skip user addition
+        const newEvent = {
+          eventDetails,
+          scheduledTime: new Date(),
+          selectedUsers: [],
+          status: 'pending'
+        };
+      
+        const insertResult = await ScheduledEvents.insertOne(newEvent);
+      
         return {
           success: true,
-          eventId: finalEvent?._id,
-          message: 'Duplicate invite detected in invite log — skipping send.'
+          eventId: insertResult.insertedId,
+          message: 'New event created, but invite was already sent — skipping user insert.'
         };
       }
+      
       
     const info = await transporter.sendMail(mailOptions);      
       // 🗂️ Log sent invite
