@@ -21,7 +21,8 @@ module.exports = async (req, res) => {
       ...formData,
       submittedAt: new Date()
     });
-    
+
+    console.log('📝 MongoDB Database is :', db);
     console.log('📝 MongoDB Insert Result:', result);
     console.log('❌ Submit form data :', formData);
 
