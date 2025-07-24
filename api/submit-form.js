@@ -7,8 +7,8 @@ module.exports = async (req, res) => {
   const formData = req.body;
   const token = formData.token;
 
-  // Uncomment this block when token validation is ready
-  // const isLocal = process.env.RUN_MODE === 'd'; // or use NODE_ENV if preferred
+  // Uncomment when ready for validation
+  // const isLocal = process.env.RUN_MODE === 'd';
   // if (!isLocal && !tokenStore.isValid(token)) {
   //   return res.status(403).json({ success: false, error: 'Invalid or expired token' });
   // }
@@ -17,7 +17,6 @@ module.exports = async (req, res) => {
     const db = await getDb();
     const submissions = db.collection('formSubmissions');
 
-    // Save form data
     const result = await submissions.insertOne({
       ...formData,
       submittedAt: new Date()
@@ -25,33 +24,46 @@ module.exports = async (req, res) => {
 
     console.log('❌ Submit form data :', formData);
 
-    // Build structured payload for main server
+    // Extract nested values from Webflow-style payload
+    const data = formData?.payload?.data || {};
+
+    const {
+      firstName = data['First Name'] || '',
+      lastName = data['Last Name'] || '',
+      email = data['E-Mail'] || '',
+      eventName = data.eventName || '',
+      eventLocation = data.eventLocation || '',
+      eventDate = data['Event Time'] || ''
+    } = data;
+
+    const startTime = eventDate ? new Date(eventDate) : null;
+    const endTime = eventDate ? new Date(startTime.getTime() + 2 * 60 * 60 * 1000) : null;
+
     const eventDetails = {
-      startTime: new Date(formData.eventDate),
-      endTime: new Date(new Date(formData.eventDate).getTime() + 2 * 60 * 60 * 1000), // 2-hour event
-      summary: formData.eventName,
-      description: `Event at ${formData.eventLocation}`,
-      location: formData.eventLocation,
+      startTime,
+      endTime,
+      summary: eventName || 'Untitled Event',
+      description: eventLocation ? `Event at ${eventLocation}` : 'No location specified',
+      location: eventLocation || '',
       organizer: {
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email
+        name: `${firstName} ${lastName}`.trim(),
+        email: email || ''
       }
     };
 
     const selectedUser = {
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email
+      name: `${firstName} ${lastName}`.trim(),
+      email: email || ''
     };
-    
 
-    // Trigger custom logic on main server
+    console.log('📦 Parsed form fields:', { firstName, lastName, email, eventName, eventLocation, eventDate });
+    console.log('➡️ Sending to main server:', { eventDetails, selectedUser });
+
     await fetch('https://admin-backend-eta.vercel.app/api/forms/submit-form', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ eventDetails, selectedUser })
     });
-     
-    console.log('➡️ Sending to main server:', { eventDetails, selectedUser });
 
     return res.status(200).json({
       success: true,
