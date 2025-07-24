@@ -113,8 +113,21 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       }
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('📬 Invite sent:', info.accepted);
+    const info = await transporter.sendMail(mailOptions);      
+      // 🗂️ Log sent invite
+      console.log('📬 Invite sent:', info.accepted);
+
+    await db.collection('invitesSent').insertOne({
+    eventId: finalEvent._id,
+    to: selectedUser.email,
+    name: selectedUser.name,
+    summary: eventDetails.summary,
+    location: eventDetails.location,
+    sentAt: new Date(),
+    organizer: eventDetails.organizer?.email,
+    source: 'microservice'
+  });
+  
 
     return {
       success: true,
