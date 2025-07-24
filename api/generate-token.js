@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const tokenStore = require('../utils/tokenStore.js');
+const tokenStore = require('./utils/tokenStore.js');
 
 module.exports = async function handler(req, res) {
   // Set CORS headers
