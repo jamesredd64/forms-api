@@ -38,6 +38,7 @@ module.exports = async (req, res) => {
   // if (!isLocal && !tokenStore.isValid(token)) {
   //   return res.status(403).json({ success: false, error: 'Invalid or expired token' });
   // }
+  
 
   try {
     const db = await getDb();
