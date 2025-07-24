@@ -17,7 +17,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-
 console.log('📧 Email transporter configured with:');
 console.log('   USER:', process.env.EMAIL_USER);
 console.log('   PASS:', process.env.EMAIL_PASS?.slice(0, 4) + '***'); // Masked for safety
