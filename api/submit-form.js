@@ -19,7 +19,22 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Run validations
+  const formData = req.body;
+  const token = formData.token;
+  const data = formData?.payload?.data || {};
+
+  // 🧼 Flatten and sanitize fields for validation
+  req.body = {
+    email: sanitizeHtml(data['E-Mail'] || ''),
+    firstName: sanitizeHtml(data['First Name'] || ''),
+    lastName: sanitizeHtml(data['Last Name'] || ''),
+    eventName: sanitizeHtml(data.eventName || ''),
+    eventLocation: sanitizeHtml(data.eventLocation || ''),
+    eventDate: sanitizeHtml(data['Event Time'] || ''),
+    token: sanitizeHtml(token || '')
+  };
+
+  // ✅ Run validations on flattened body
   for (const validate of validations) {
     await validate.run(req);
   }
@@ -30,53 +45,37 @@ module.exports = async (req, res) => {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
 
-  const formData = req.body;
-  const token = formData.token;
-
-  // Optional token validation
-  // const isLocal = process.env.RUN_MODE === 'd';
-  // if (!isLocal && !tokenStore.isValid(token)) {
-  //   return res.status(403).json({ success: false, error: 'Invalid or expired token' });
-  // }
-  
-
   try {
     const db = await getDb();
     const submissions = db.collection('formsubmissions');
 
-    const sanitizedData = {
+    const sanitizedSubmission = {
       ...formData,
-      firstName: sanitizeHtml(formData.firstName),
-      lastName: sanitizeHtml(formData.lastName),
-      email: sanitizeHtml(formData.email),
-      eventName: sanitizeHtml(formData.eventName),
-      eventLocation: sanitizeHtml(formData.eventLocation),
-      eventDate: sanitizeHtml(formData.eventDate),
       submittedAt: new Date()
     };
 
-    const insertResult = await submissions.insertOne(sanitizedData);
-    console.log('📥 Incoming sanitized form payload:', sanitizedData);
+    const insertResult = await submissions.insertOne(sanitizedSubmission);
+    console.log('📥 Incoming sanitized form payload:', sanitizedSubmission);
     console.log('📝 Mongo Insert Result:', insertResult);
 
-    const startTime = new Date(sanitizedData.eventDate);
+    const startTime = new Date(req.body.eventDate);
     const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000);
 
     const eventDetails = {
       startTime,
       endTime,
-      summary: sanitizedData.eventName,
-      description: `Event at ${sanitizedData.eventLocation}`,
-      location: sanitizedData.eventLocation,
+      summary: req.body.eventName,
+      description: `Event at ${req.body.eventLocation}`,
+      location: req.body.eventLocation,
       organizer: {
-        name: `${sanitizedData.firstName} ${sanitizedData.lastName}`.trim(),
-        email: sanitizedData.email
+        name: `${req.body.firstName} ${req.body.lastName}`.trim(),
+        email: req.body.email
       }
     };
 
     const selectedUser = {
-      name: `${sanitizedData.firstName} ${sanitizedData.lastName}`.trim(),
-      email: sanitizedData.email
+      name: `${req.body.firstName} ${req.body.lastName}`.trim(),
+      email: req.body.email
     };
 
     console.log('📦 Parsed and sanitized fields:', { eventDetails, selectedUser });
