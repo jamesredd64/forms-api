@@ -1,4 +1,4 @@
-const { getDb } = require('./utils/mongoClient'); // Adjust path as needed
+const { getDb } = require('../utils/mongoClient'); // Adjust path as needed
 const { generateICalEvent } = require('./utils/ical.utils');
 const nodemailer = require('nodemailer');
 
