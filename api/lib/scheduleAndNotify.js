@@ -113,6 +113,22 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       }
     };
 
+    const recentInvite = await db.collection('invitesSent').findOne({
+        to: selectedUser.email,
+        summary: eventDetails.summary,
+        location: eventDetails.location,
+        sentAt: { $gte: new Date(Date.now() - 10 * 60 * 1000) } // last 10 minutes
+      });
+      
+      if (recentInvite) {
+        console.warn('⏱️ Invite already sent recently via invitesSent log. Skipping.');
+        return {
+          success: true,
+          eventId: finalEvent?._id,
+          message: 'Duplicate invite detected in invite log — skipping send.'
+        };
+      }
+      
     const info = await transporter.sendMail(mailOptions);      
       // 🗂️ Log sent invite
       console.log('📬 Invite sent:', info.accepted);
