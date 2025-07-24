@@ -1,4 +1,4 @@
-const { getDb } = require('../utils/mongoClient'); // Adjust path as needed
+const { getDb } = require('../utils/mongoClient');
 const { generateICalEvent } = require('../utils/ical.utils');
 const nodemailer = require('nodemailer');
 
@@ -24,7 +24,7 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
 
   try {
     const db = await getDb();
-    const ScheduledEvents = db.collection('scheduledEvents'); // Use lowercase or adjust if collection is mapped differently
+    const ScheduledEvents = db.collection('scheduledEvents');
 
     // 🔎 Look for existing event by summary, location, organizer email
     const candidates = await ScheduledEvents.find({
@@ -39,8 +39,26 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
 
     let finalEvent;
 
+    // ⏱️ Check for duplicate invite within 10 minutes
+    const isDuplicateInvite = existingEvent?.selectedUsers?.some(u =>
+      u.email === selectedUser.email &&
+      u.lastInvitedAt &&
+      new Date() - new Date(u.lastInvitedAt) < 10 * 60 * 1000
+    );
+
+    if (isDuplicateInvite) {
+      console.warn('⏱️ Skipping re-invite: Recently sent to', selectedUser.email);
+      return {
+        success: true,
+        eventId: existingEvent._id,
+        message: 'Invite already sent recently — skipping.'
+      };
+    }
+
+    selectedUser.lastInvitedAt = new Date(); // Add timestamp
+
     if (existingEvent) {
-      // 🛠 Update existing
+      // 🛠 Update existing event
       const update = {
         $set: {
           'eventDetails.endTime': new Date(eventDetails.endTime),
@@ -58,7 +76,7 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       await ScheduledEvents.updateOne({ _id: existingEvent._id }, update);
       finalEvent = await ScheduledEvents.findOne({ _id: existingEvent._id });
     } else {
-      // 🆕 Create new
+      // 🆕 Create new event
       const startDate = new Date(eventDetails.startTime);
       startDate.setUTCHours(0, 0, 0, 0);
       eventDetails.startTime = new Date(startDate);
@@ -76,7 +94,7 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       finalEvent = { ...newEvent, _id: insertResult.insertedId };
     }
 
-    // 📧 Send email invite
+    // 📧 Generate invite
     const icsContent = generateICalEvent({
       ...eventDetails,
       to: selectedUser
