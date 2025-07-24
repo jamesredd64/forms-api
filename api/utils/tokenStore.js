@@ -11,6 +11,7 @@ class TokenStore {
       this.tokens.delete(token);
     }, expiresInMs);
   }
+  
 
   isValid(token) {
     if (!this.tokens.has(token)) {

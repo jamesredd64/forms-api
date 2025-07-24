@@ -23,6 +23,8 @@ module.exports = async (req, res) => {
       submittedAt: new Date()
     });
 
+    console.log('❌ Submit form data :', formData);
+
     // Build structured payload for main server
     const eventDetails = {
       startTime: new Date(formData.eventDate),
@@ -40,6 +42,7 @@ module.exports = async (req, res) => {
       name: `${formData.firstName} ${formData.lastName}`,
       email: formData.email
     };
+    
 
     // Trigger custom logic on main server
     await fetch('https://admin-backend-eta.vercel.app/api/forms/submit-form', {
