@@ -47,7 +47,10 @@ module.exports = async (req, res) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ eventDetails, selectedUser })
     });
+     
+    console.log('➡️ Sending to main server:', { eventDetails, selectedUser });
 
+    
     return res.status(200).json({
       success: true,
       insertedId: result.insertedId,
