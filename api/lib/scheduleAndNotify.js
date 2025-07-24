@@ -17,6 +17,10 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+console.log('📧 Email transporter configured with:');
+console.log('   USER:', process.env.EMAIL_USER);
+console.log('   PASS:', process.env.EMAIL_PASS?.slice(0, 4) + '***'); // Masked for safety
+
 async function scheduleAndNotify({ eventDetails, selectedUser }) {
   if (!eventDetails || !selectedUser || !selectedUser.email) {
     throw new Error('Missing required eventDetails or selectedUser');
