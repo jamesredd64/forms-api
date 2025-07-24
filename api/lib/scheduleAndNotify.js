@@ -33,9 +33,16 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       'eventDetails.organizer.email': eventDetails.organizer?.email
     }).toArray();
 
-    const existingEvent = candidates.find(event =>
-      compareDates(event.eventDetails?.startTime?.toISOString?.(), eventDetails.startTime.toISOString().split('T')[0])
-    );
+    const normalizeDate = (dateStr) => {
+        const date = new Date(dateStr);
+        date.setUTCHours(0, 0, 0, 0);
+        return date.getTime();
+      };
+      
+      const existingEvent = candidates.find(event =>
+        normalizeDate(event.eventDetails?.startTime) === normalizeDate(eventDetails.startTime)
+      );
+      
 
     let finalEvent;
 
