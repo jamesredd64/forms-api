@@ -17,7 +17,7 @@ async function getDb() {
   }
 
   if (!db) {
-    const dbName = process.env.MONGODB_DB_NAME || 'default-db';
+    const dbName = process.env.MONGODB_DB_NAME || 'mongo_users-react-dev';
     db = client.db(dbName);
   }
 
