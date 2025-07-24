@@ -45,8 +45,7 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       
       const existingEvent = candidates.find(event =>
         normalizeDate(event.eventDetails?.startTime) === normalizeDate(eventDetails.startTime)
-      );
-      
+      );      
 
     let finalEvent;
 
