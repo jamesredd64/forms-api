@@ -47,8 +47,7 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
         normalizeDate(event.eventDetails?.startTime) === normalizeDate(eventDetails.startTime)
       );      
 
-      let finalEvent;
-      
+      let finalEvent;      
 
     // ⏱️ Check for duplicate invite within 10 minutes
     const isDuplicateInvite = existingEvent?.selectedUsers?.some(u =>
