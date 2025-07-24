@@ -54,7 +54,7 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
     const isDuplicateInvite = existingEvent?.selectedUsers?.some(u =>
       u.email === selectedUser.email &&
       u.lastInvitedAt &&
-      new Date() - new Date(u.lastInvitedAt) < 10 * 60 * 1000
+      new Date() - new Date(u.lastInvitedAt) < 2 * 60 * 1000
     );
 
     if (isDuplicateInvite) {
