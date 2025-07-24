@@ -50,7 +50,6 @@ module.exports = async (req, res) => {
      
     console.log('➡️ Sending to main server:', { eventDetails, selectedUser });
 
-    
     return res.status(200).json({
       success: true,
       insertedId: result.insertedId,
