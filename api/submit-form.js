@@ -33,6 +33,7 @@ module.exports = async (req, res) => {
     eventDate: sanitizeHtml(data['Event Time'] || ''),
     token: sanitizeHtml(token || '')
   };
+  
 
   // ✅ Run validations on flattened body
   for (const validate of validations) {
