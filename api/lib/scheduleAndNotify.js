@@ -32,8 +32,8 @@ const transporter = nodemailer.createTransport({
 // });
 
 console.log('📧 Email transporter configured with:');
-console.log('   USER:', "jameshredd@yahoo.com");
-console.log('   PASS:', "fivzcftsvtmdcyxo"); // app password
+console.log('   USER:', "jamesredd0206@gmail.com");
+console.log('   PASS:', "obne cmib ckbq lwts"); // app password
 // console.log('   PASS:', process.env.EMAIL_PASS?.slice(0, 4) + '***'); // Masked for safety
 
 async function scheduleAndNotify({ eventDetails, selectedUser }) {
