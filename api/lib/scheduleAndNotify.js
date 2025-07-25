@@ -28,8 +28,8 @@ const transporter = nodemailer.createTransport({
 // });
 
 console.log('📧 Email transporter configured with:');
-console.log('   USER:', "sjameshredd@mail.com");
-console.log('   PASS:', "Zeusapollo2025!!"); // Masked for safety
+console.log('   USER:', "jameshredd@yahoo.com");
+console.log('   PASS:', "fivzcftsvtmdcyxo"); // app password
 // console.log('   PASS:', process.env.EMAIL_PASS?.slice(0, 4) + '***'); // Masked for safety
 
 
