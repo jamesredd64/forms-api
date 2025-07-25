@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 
 
 console.log('📧 Email transporter configured with:');
-console.log('   USER:', "jamesredd0206@gmail.com");
+console.log('   USER:', "support@showcase.education");
 console.log('   PASS:', "obne cmib ckbq lwts"); // Masked for safety
 // console.log('   PASS:', process.env.EMAIL_PASS?.slice(0, 4) + '***'); // Masked for safety
 
