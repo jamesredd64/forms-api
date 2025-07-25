@@ -17,7 +17,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-
 console.log('📧 Email transporter configured with:');
 console.log('   USER:', "support@showcase.education");
 console.log('   PASS:', "obne cmib ckbq lwts"); // Masked for safety
