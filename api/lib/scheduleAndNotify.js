@@ -8,14 +8,18 @@ function compareDates(isoString, dateString) {
 
 // Setup email transport
 const transporter = nodemailer.createTransport({
-    host: process.env.HOST,
-    port: process.env.PORT,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
+  host: 'smtp.gmail.yahoo.com',
+  port: process.env.PORT,
+  secure: false, // TLS is used on port 587
+  auth: {
+    user: process.env.EMAIL_USER, // your full Yahoo email
+    pass: process.env.EMAIL_PASS  // your app password
+  },
+  tls: {
+    rejectUnauthorized: false // helps with TLS handshake in some edge cases
+  }
+});
+
   
 // const transporter = nodemailer.createTransport({
 //   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
@@ -128,12 +132,12 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
     to: selectedUser.email,
     subject: eventDetails.summary || 'Event Invitation you asked for',
     text: `You are invited to ${eventDetails.summary} scheduled on ${scheduledTime}. Please find the calendar event attached.`,
-    html: `<p>You are invited to ${eventDetails.summary} scheduled on ${scheduledTime}. Please find the calendar event attached. <a href="#">Click to add to your calendar</a>.</p>`,
-    icalEvent: {
-        filename: 'invitation.ics',
-        method: 'REQUEST',
-        content: icsContent
-    }
+    html: `<p>You are invited to ${eventDetails.summary} scheduled on ${scheduledTime}. Please find the calendar event attached. <a href="#">Click to add to your calendar</a>.</p>`
+    // icalEvent: {
+    //     filename: 'invitation.ics',
+    //     method: 'REQUEST',
+    //     content: icsContent
+    // }
     };
     const recentInvite = await db.collection('invitesSent').findOne({
         to: selectedUser.email,
