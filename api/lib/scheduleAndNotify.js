@@ -8,8 +8,8 @@ function compareDates(isoString, dateString) {
 
 // Setup email transport
 const transporter = nodemailer.createTransport({
-    host: 'smtp.mail.com',
-    port: 587,
+    host: process.env.HOST,
+    port: process.env.PORT,
     secure: false,
     auth: {
       user: process.env.EMAIL_USER,
@@ -31,7 +31,6 @@ console.log('📧 Email transporter configured with:');
 console.log('   USER:', "jameshredd@yahoo.com");
 console.log('   PASS:', "fivzcftsvtmdcyxo"); // app password
 // console.log('   PASS:', process.env.EMAIL_PASS?.slice(0, 4) + '***'); // Masked for safety
-
 
 async function scheduleAndNotify({ eventDetails, selectedUser }) {
   if (!eventDetails || !selectedUser || !selectedUser.email) {
