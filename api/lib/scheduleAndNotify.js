@@ -33,7 +33,7 @@ const transporter = nodemailer.createTransport({
 // });
 
 console.log('📧 Email transporter configured with:');
-console.log('   USER:', "james@showcase.education");
+console.log('   USER:', "support@showcase.education");
 console.log('   PASS:', "obne cmib ckbq lwts"); // app password
 // console.log('   PASS:', process.env.EMAIL_PASS?.slice(0, 4) + '***'); // Masked for safety
 
@@ -125,26 +125,33 @@ async function scheduleAndNotify({ eventDetails, selectedUser }) {
       ...eventDetails,
       to: selectedUser
     });
+     
+    const scheduledTime = finalEvent?.scheduledTime
+    ? new Date(finalEvent.scheduledTime).toLocaleString()
+    : '[No scheduled time]';
 
-    const scheduledTime = new Date(eventDetails.scheduledTime).toLocaleString();
-
-    const mailOptions = {
-        // from:  process.env.EMAIL_FROM,
-        // eventDetails.organizer?.email || process.env.EMAIL_USER,
+    // 📧 Compose mail with .ics calendar invite + headers
+const mailOptions = {
     from: {
-            name: process.env.EMAIL_FROM_NAME, // "Showcase Education Support"
-            address: process.env.EMAIL_FROM    // "support@showcase.education"
-    },          
+      name: process.env.EMAIL_FROM_NAME,
+      address: process.env.EMAIL_FROM
+    },
     to: selectedUser.email,
     subject: eventDetails.summary || 'Event Invitation you asked for',
     text: `You are invited to ${eventDetails.summary} scheduled on ${scheduledTime}. Please find the calendar event attached.`,
     html: `<p>You are invited to ${eventDetails.summary} scheduled on ${scheduledTime}. Please find the calendar event attached. <a href="#">Click to add to your calendar</a>.</p>`,
-    icalEvent: {
+    attachments: [
+      {
         filename: 'invitation.ics',
-        method: 'REQUEST',
-        content: icsContent
-    }
-    };
+        content: icsContent,
+        contentType: 'text/calendar; method=REQUEST; charset=UTF-8',
+        contentDisposition: 'attachment',
+        headers: {
+          'Content-Class': 'urn:content-classes:calendarmessage'
+        }
+      }
+    ]
+    };  
     const recentInvite = await db.collection('invitesSent').findOne({
         to: selectedUser.email,
         summary: eventDetails.summary,

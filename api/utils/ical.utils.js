@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { formatDate, formatDateWithoutZ } from './utile/date.utils';
+import { formatDate, formatDateWithoutZ } from './date.utils.js';
 
 export function generateICalEvent(event = {}) {
   const domain = process.env.DOMAIN || 'stagholme.com';
